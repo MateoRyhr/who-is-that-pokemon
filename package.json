@@ -1,0 +1,14 @@
+{
+  "name": "who-is-that-pokemon",
+  "version": "1.0.0",
+  "description": "A simple game that consists of recognizing the pokemon by an image.",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server"
+  },
+  "author": "Mateo Ryhr <mateoryhr29@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
