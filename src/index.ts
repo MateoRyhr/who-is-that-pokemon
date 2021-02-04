@@ -12,11 +12,16 @@ let pokemonID: number = 0
 let pokemonName: string = ''
 let pokemonImage: string = ''
 
-function request(url:string, callback:any): any{
-    return  fetch(url)
-                .then(response => response.json())//convert the first reponse of fetch to json
-                .then(callback)//obtain data
-                .catch(error => console.error(error))
+async function request(url:string, callback:any): Promise<any>{
+    const response = await fetch(url)
+    if(response.ok){
+        const data = await response.json()//convert the first reponse of fetch to json
+        const dataToReturn = await callback(data)
+
+        return dataToReturn
+    }else {
+        throw new Error("Error al conectar con PokeAPI")
+    }    
 }
 
 function getPokemonCount(): any{
@@ -30,30 +35,23 @@ function generateRandomPokemon(pokemonCount: number){
     return pokemonID
 }
 
-function getPokemonImage(pokemonID:number): any{
-    const pokemonUrl:string = `${apiUrl}pokemon-form/${pokemonID}/`
-    return request(pokemonUrl,(data:any) => {pokemonImage = data.sprites.front_default; console.log(pokemonImage)})
-}
-
-function getPokemonName(pokemonID:number): any{
-    const pokemonUrl:string = `${apiUrl}pokemon-form/${pokemonID}/`
-    return request(pokemonUrl,(data:any) => {pokemonName = data.pokemon.name; console.log(pokemonName)})
-}
-
 function loadPokemonInDOM(): void{
     img.src = pokemonImage
 }
 
-function init(): void{
-    console.log("lala")
-    // getPokemonCount()
-    //     .then((pokemonCount:any) => pokemonID = generateRandomPokemon(pokemonCount))
+async function init(){
+
     pokemonID = generateRandomPokemon(getPokemonCount())
-    console.log(pokemonID)
-    pokemonName = getPokemonName(pokemonID)
-        .then(() => getPokemonImage(pokemonID))
-        .then(() => {loadPokemonInDOM()})
-        .catch((error: Error) => console.error(error))
+    const pokemonUrl:string = `${apiUrl}pokemon-form/${pokemonID}/`
+    try{
+        pokemonName = await request(pokemonUrl,(data:any) => data.pokemon.name)
+        console.log(pokemonName)
+        pokemonImage = await request(pokemonUrl,(data:any) => data.sprites.front_default)
+        loadPokemonInDOM()
+    }catch(error){
+        console.error(error)
+        alert(error)
+    }
 }
 
 function win(){
